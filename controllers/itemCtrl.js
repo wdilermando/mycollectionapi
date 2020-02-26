@@ -12,6 +12,7 @@ module.exports = {
             return res.status(400).json({ message: 'As informações do item devem ser preenchidas!' })
         }
         try {
+            
             let { title } = req.body;
             await itemModel.findOne({ title }, async (err, obj) => {
                 if (err) return res.json([]);
