@@ -7,7 +7,7 @@ router.post('/login', AuthCtrl.login);
 
 router.use(AuthCtrl.check_token);
 
-router.post('/register', AuthCtrl.register);
 router.get('/user', AuthCtrl.user_data);
+router.post('/register', AuthCtrl.register);
 
 module.exports = router;

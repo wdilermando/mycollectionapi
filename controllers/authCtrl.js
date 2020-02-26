@@ -1,3 +1,4 @@
+require('dotenv').config()
 const userModel = require('../models/userModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -8,7 +9,7 @@ module.exports = {
             let u = await userModel.findOne({email: req.body.email});
             if(!u){
                 const user = new userModel(req.body);
-                user.password = bcrypt.hashSync(req.body.password, process.env.BCRYPTSALTS)
+                user.password = bcrypt.hashSync(req.body.password, parseInt(process.env.BCRYPTSALTS))
                 await user.save()
                 delete user.password;
                 res.status(201).json(user);
@@ -22,7 +23,7 @@ module.exports = {
         }
     },
     login: (req, res)=>{
-        const {email, password} = req.body;
+        const {email, password} = req.body;        
 
         userModel.findOne({email}).lean().exec((err, user)=>{
             if(err) return res.status(500).json({message:'Erro no servidor', error: err})
@@ -30,7 +31,7 @@ module.exports = {
             
             if(!auth_error){
                 if(bcrypt.compareSync(password, user.password)){
-                    let token = jwt.sign({_id: user._id}, process.env.KEYJWT, {expiresIn: process.env.EXPIRESJWT})
+                    let token = jwt.sign({_id: user._id}, process.env.KEYJWT, {expiresIn: parseInt(process.env.EXPIRESJWT)})
                     delete user.password
                     return res.json({...user, token})
                 }
@@ -44,7 +45,8 @@ module.exports = {
         if(!token){
             return res.status(401).json({message: 'Token não encontrado'})
         }
-        jwt.verify(token, consts.keyJwt, (err, decoded)=>{
+        
+        jwt.verify(token, process.env.KEYJWT, (err, decoded)=>{
             if(err || !decoded){
                 return res.status(401).json({message: 'Erro de autenticação, token inválido'});
             }
@@ -53,7 +55,7 @@ module.exports = {
     },
     user_data: (req, res) => { 
         const token = req.get('Authorization');
-        jwt.verify(token, consts.keyJwt, (err, decoded)=>{
+        jwt.verify(token, process.env.KEYJWT, (err, decoded)=>{
             const id = decoded._id;
             userModel.findById(id).lean().exec((err, user)=>{
                 if(err || !user) {
@@ -61,7 +63,7 @@ module.exports = {
                         message: 'Falha ao buscar o usuário', error: err
                     })
                 }
-                let token = jwt.sign({_id: user._id}, consts.keyJwt, {expiresIn: consts.expiresJwt});
+                let token = jwt.sign({_id: user._id}, process.env.KEYJWT, {expiresIn: parseInt(process.env.EXPIRESJWT)});
                 
                 delete user.password
                 return res.json({...user, token})
