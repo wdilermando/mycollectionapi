@@ -1,0 +1,8 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/922e53e8-eaad-47ef-ba9c-c224f03b158e/resourceGroups/atlabox/providers/Microsoft.Web/sites/acervocollectionapi",
+    "appService.deploySubpath": "",
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ]
+}
